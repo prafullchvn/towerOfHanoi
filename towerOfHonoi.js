@@ -1,5 +1,5 @@
 const { generatePage } = require('./generatePage.js');
-const { readFileSync, writeFileSync } = require('fs');
+const fs = require('fs');
 
 const isOverflow = function (stack, maxSize) {
   return stack.length + 1 > maxSize;
@@ -34,29 +34,40 @@ const playMove = function (game, from, to) {
 
 const isGameOver = (game) => game.towers['3'].join('') === '9876';
 
-const readStatus = file => JSON.parse(readFileSync(file, 'utf8'));
+const readStatus = file => JSON.parse(fs.readFileSync(file, 'utf8'));
 
 const commitStatus = (file, gameStatus) => {
-  writeFileSync(file, JSON.stringify(gameStatus), 'utf8');
+  fs.writeFileSync(file, JSON.stringify(gameStatus), 'utf8');
 };
 
 const writeHtmlFile = function (targetFile, html) {
-  writeFileSync(targetFile, html + '', 'utf8');
+  fs.writeFileSync(targetFile, html + '', 'utf8');
 };
 
-let main = function (fromTower, toTower) {
-  const game = readStatus(this.gameStatusFile);
-  playMove(game, game.towers[fromTower], game.towers[toTower]);
-  game.isGameOver = isGameOver(game);
-  commitStatus(this.gameStatusFile, game);
-  const html = generatePage(game, readFileSync(this.templateFile, 'utf8'));
-  writeHtmlFile(this.targetFile, html);
+let main = function ({ gameStatusFile, templateFile, targetFile }, userInput) {
+  const game = readStatus(gameStatusFile);
+
+  const sourceTower = game.towers[userInput.fromTower];
+  const destinationTower = game.towers[userInput.toTower];
+  playMove(game, sourceTower, destinationTower);
+  game.isGameOver = isGameOver(game); // doubt
+
+  const template = fs.readFileSync(templateFile, 'utf8')
+  const html = generatePage(game, template);
+  writeHtmlFile(targetFile, html);
+
+  commitStatus(gameStatusFile, game);
 };
 
-main = main.bind({
+const files = {
   gameStatusFile: './resources/gameStatus.json',
   templateFile: './resources/template.html',
   targetFile: './towers/towers.html'
-});
+};
 
-main(process.argv[2], process.argv[3]);
+const userInput = {
+  fromTower: process.argv[2],
+  toTower: process.argv[3]
+};
+
+main(files, userInput);
