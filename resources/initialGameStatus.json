@@ -1,0 +1,15 @@
+{
+  "towers": {
+    "1": [
+      9,
+      8,
+      7,
+      6
+    ],
+    "2": [],
+    "3": []
+  },
+  "maxSize": 4,
+  "isGameOver": false,
+  "totalMoves": -1
+}
