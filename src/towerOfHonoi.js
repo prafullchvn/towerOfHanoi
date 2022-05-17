@@ -1,3 +1,4 @@
+const assert = require('assert');
 const { generatePage } = require('./generatePage.js');
 const fs = require('fs');
 
@@ -34,7 +35,15 @@ const playMove = function (game, { from, to }) {
   }
 };
 
-const isGameOver = (game) => game.towers['3'].join('') === '9876';
+const isGameOver = (game) => {
+  try {
+    assert.deepStrictEqual(game.towers['3'], [9, 8, 7, 6]);
+    return true;
+  } catch (error) {
+    return false;
+  }
+  // game.towers['3'].join('') === '9876'
+};
 
 const readFile = file => {
   try {
@@ -46,25 +55,28 @@ const readFile = file => {
 
 const saveChanges = (file, data) => {
   try {
-    return fs.writeFileSync(file, data, 'utf8');
+    fs.writeFileSync(file, data, 'utf8');
   } catch (error) {
     throw error.name + '->' + error.message;
   }
 };
 
-const main = function (files, userInput) {
-  const game = JSON.parse(readFile(files.gameStatusFile));
+const readJsonFile = filePath => JSON.parse(readFile(filePath));
+
+const main = function (filePaths, userInput) {
+  const game = readJsonFile(filePaths.gameStatusFile);
+
   playMove(game, userInput);
-  game.isGameOver = isGameOver(game); // doubt
+  game.isOver = isGameOver(game);
 
-  const template = readFile(files.templateFile);
+  const template = readFile(filePaths.templateFile);
   const html = generatePage(game, template);
-  saveChanges(files.targetFile, html);
+  saveChanges(filePaths.targetFile, html);
 
-  saveChanges(files.gameStatusFile, JSON.stringify(game));
+  saveChanges(filePaths.gameStatusFile, JSON.stringify(game));
 };
 
-const files = {
+const filePaths = {
   gameStatusFile: './resources/gameStatus.json',
   templateFile: './resources/template.html',
   targetFile: './towers/towers.html'
@@ -75,4 +87,4 @@ const userInput = {
   to: process.argv[3]
 };
 
-main(files, userInput);
+main(filePaths, userInput);

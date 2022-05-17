@@ -10,6 +10,6 @@
     "3": []
   },
   "maxSize": 4,
-  "isGameOver": false,
+  "isOver": false,
   "totalMoves": -1
 }
