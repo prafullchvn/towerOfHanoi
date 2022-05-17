@@ -24,39 +24,44 @@ const isValidMove = function (from, to) {
   return topOfStack(to) > topOfStack(from);
 };
 
-const playMove = function (game, from, to) {
+const playMove = function (game, { from, to }) {
+  const sourceTower = game.towers[from];
+  const destinationTower = game.towers[to];
+
   game.totalMoves++;
-  if (!isValidMove(from, to)) {
-    return false;
+  if (isValidMove(sourceTower, destinationTower)) {
+    destinationTower.push(sourceTower.pop());
   }
-  to.push(from.pop());
 };
 
 const isGameOver = (game) => game.towers['3'].join('') === '9876';
 
-const readStatus = file => JSON.parse(fs.readFileSync(file, 'utf8'));
-
-const commitStatus = (file, gameStatus) => {
-  fs.writeFileSync(file, JSON.stringify(gameStatus), 'utf8');
+const readFile = file => {
+  try {
+    return fs.readFileSync(file, 'utf8');
+  } catch (error) {
+    throw error.name + '->' + error.message;
+  }
 };
 
-const writeHtmlFile = function (targetFile, html) {
-  fs.writeFileSync(targetFile, html + '', 'utf8');
+const saveChanges = (file, data) => {
+  try {
+    return fs.writeFileSync(file, data, 'utf8');
+  } catch (error) {
+    throw error.name + '->' + error.message;
+  }
 };
 
-let main = function ({ gameStatusFile, templateFile, targetFile }, userInput) {
-  const game = readStatus(gameStatusFile);
-
-  const sourceTower = game.towers[userInput.fromTower];
-  const destinationTower = game.towers[userInput.toTower];
-  playMove(game, sourceTower, destinationTower);
+const main = function (files, userInput) {
+  const game = JSON.parse(readFile(files.gameStatusFile));
+  playMove(game, userInput);
   game.isGameOver = isGameOver(game); // doubt
 
-  const template = fs.readFileSync(templateFile, 'utf8')
+  const template = readFile(files.templateFile);
   const html = generatePage(game, template);
-  writeHtmlFile(targetFile, html);
+  saveChanges(files.targetFile, html);
 
-  commitStatus(gameStatusFile, game);
+  saveChanges(files.gameStatusFile, JSON.stringify(game));
 };
 
 const files = {
@@ -66,8 +71,8 @@ const files = {
 };
 
 const userInput = {
-  fromTower: process.argv[2],
-  toTower: process.argv[3]
+  from: process.argv[2],
+  to: process.argv[3]
 };
 
 main(files, userInput);

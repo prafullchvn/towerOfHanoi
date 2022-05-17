@@ -1,20 +1,22 @@
 function playMove() {
-  local fromTower=$1
-  local toTower=$2
-  node towerOfHonoi.js $fromTower $toTower
+  local gameFile=$1
+  local fromTower=$2
+  local toTower=$3
+  node $gameFile $fromTower $toTower 
 }
 
 function main() {
   local statusFile=$1
+  local gameFile='src/towerOfHonoi.js'
 
   cp 'resources/initialGameStatus.json' $statusFile
-  playMove 1 1
+  playMove $gameFile 1 1
   open towers/towers.html
 
-  while grep -q 'false' $statusFile 
+  while grep -q 'false' $statusFile
   do 
     read -p "Source Destination " fromTower toTower
-    playMove $fromTower $toTower
+    playMove $gameFile $fromTower $toTower
   done
 }
 
