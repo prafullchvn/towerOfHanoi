@@ -6,9 +6,8 @@ describe('IsValidMove tests', () => {
     const inputs = {
       sourceTower: [1],
       destinationTower: [3, 2],
-      maxSize: 2
     };
-    assert.strictEqual(isValidMove(inputs), false);
+    assert.strictEqual(isValidMove(inputs, 2), false);
   });
   it('Should return false when source tower is underflow.', () => {
     const inputs = {

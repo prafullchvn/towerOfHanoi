@@ -16,7 +16,7 @@ const topOfStack = function (stack) {
   return top ? top : Infinity;
 };
 
-const isValidMove = function ({ sourceTower, destinationTower, maxSize }) {
+const isValidMove = function ({ destinationTower, sourceTower }, maxSize) {
   if (isOverflow(destinationTower, maxSize)) {
     return false;
   }
@@ -28,13 +28,21 @@ const isValidMove = function ({ sourceTower, destinationTower, maxSize }) {
 
 const copy = (obj) => JSON.parse(JSON.stringify(obj));
 
+const isInRange = (value, max) => value >= 0 && value <= max;
+
+const areValidInputs = (from, to, max) => {
+  return isInRange(from, max) && isInRange(to, max);
+};
+
 const playMove = function (game, { from, to }) {
   const gameStatus = copy(game);
   const sourceTower = gameStatus.towers[from];
   const destinationTower = gameStatus.towers[to];
 
   gameStatus.totalMoves++;
-  if (isValidMove({ sourceTower, destinationTower, maxSize: game.maxSize })) {
+  const towers = { sourceTower, destinationTower };
+  const { totalTowers, maxSize } = game;
+  if (areValidInputs(from, to, totalTowers) && isValidMove(towers, maxSize)) {
     destinationTower.push(sourceTower.pop());
   }
 
@@ -79,3 +87,4 @@ exports.isOverflow = isOverflow;
 exports.isUnderflow = isUnderflow;
 exports.isValidMove = isValidMove;
 exports.isGameOver = isGameOver;
+exports.topOfStack = topOfStack;

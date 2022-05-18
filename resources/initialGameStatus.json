@@ -11,5 +11,6 @@
   },
   "maxSize": 4,
   "isOver": false,
-  "totalMoves": -1
+  "totalMoves": -1,
+  "totalTowers": 3
 }
