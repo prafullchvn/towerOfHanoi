@@ -1,8 +1,9 @@
-const assert = require('assert');
-const { generatePage } = require('./generatePage.js');
 const fs = require('fs');
 
-const isOverflow = function (stack, maxSize) {
+const { deepEqual } = require('./deepEqual.js');
+const { generatePage } = require('./generatePage.js');
+
+const isOverflow = (stack, maxSize) => {
   return stack.length + 1 > maxSize;
 };
 
@@ -12,38 +13,35 @@ const isUnderflow = function (stack) {
 
 const topOfStack = function (stack) {
   const top = stack[stack.length - 1];
-  return top ? top : 50;
+  return top ? top : Infinity;
 };
 
-const isValidMove = function (from, to) {
-  if (isOverflow(to)) {
+const isValidMove = function ({ sourceTower, destinationTower, maxSize }) {
+  if (isOverflow(destinationTower, maxSize)) {
     return false;
   }
-  if (isUnderflow(from)) {
+  if (isUnderflow(sourceTower)) {
     return false;
   }
-  return topOfStack(to) > topOfStack(from);
+  return topOfStack(destinationTower) > topOfStack(sourceTower);
 };
+
+const copy = (obj) => JSON.parse(JSON.stringify(obj));
 
 const playMove = function (game, { from, to }) {
-  const sourceTower = game.towers[from];
-  const destinationTower = game.towers[to];
+  const gameStatus = copy(game);
+  const sourceTower = gameStatus.towers[from];
+  const destinationTower = gameStatus.towers[to];
 
-  game.totalMoves++;
-  if (isValidMove(sourceTower, destinationTower)) {
+  gameStatus.totalMoves++;
+  if (isValidMove({ sourceTower, destinationTower, maxSize: game.maxSize })) {
     destinationTower.push(sourceTower.pop());
   }
+
+  return gameStatus;
 };
 
-const isGameOver = (game) => {
-  try {
-    assert.deepStrictEqual(game.towers['3'], [9, 8, 7, 6]);
-    return true;
-  } catch (error) {
-    return false;
-  }
-  // game.towers['3'].join('') === '9876'
-};
+const isGameOver = (game) => deepEqual(game.towers[3], [9, 8, 7, 6]);
 
 const readFile = file => {
   try {
@@ -64,9 +62,9 @@ const saveChanges = (file, data) => {
 const readJsonFile = filePath => JSON.parse(readFile(filePath));
 
 const main = function (filePaths, userInput) {
-  const game = readJsonFile(filePaths.gameStatusFile);
+  let game = readJsonFile(filePaths.gameStatusFile);
 
-  playMove(game, userInput);
+  game = playMove(game, userInput);
   game.isOver = isGameOver(game);
 
   const template = readFile(filePaths.templateFile);
@@ -76,15 +74,8 @@ const main = function (filePaths, userInput) {
   saveChanges(filePaths.gameStatusFile, JSON.stringify(game));
 };
 
-const filePaths = {
-  gameStatusFile: './resources/gameStatus.json',
-  templateFile: './resources/template.html',
-  targetFile: './towers/towers.html'
-};
-
-const userInput = {
-  from: process.argv[2],
-  to: process.argv[3]
-};
-
-main(filePaths, userInput);
+exports.main = main;
+exports.isOverflow = isOverflow;
+exports.isUnderflow = isUnderflow;
+exports.isValidMove = isValidMove;
+exports.isGameOver = isGameOver;

@@ -1,1 +1,1 @@
-{"towers":{"1":[9,8],"2":[],"3":[7,6]},"maxSize":4,"isOver":false,"totalMoves":3}
+{"towers":{"1":[9,8,7],"2":[6],"3":[]},"maxSize":4,"isOver":false,"totalMoves":1}

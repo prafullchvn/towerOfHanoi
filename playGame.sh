@@ -7,13 +7,13 @@ function playMove() {
 
 function main() {
   local statusFile=$1
-  local gameFile='src/towerOfHonoi.js'
+  local gameFile='src/playMove.js'
 
   cp 'resources/initialGameStatus.json' $statusFile
   playMove $gameFile 1 1
   open towers/towers.html
 
-  while grep -q 'false' $statusFile
+  while grep -q '"isOver".*false' $statusFile
   do 
     read -p "Source Destination " fromTower toTower
     playMove $gameFile $fromTower $toTower

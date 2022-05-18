@@ -13,7 +13,7 @@ const createTower = function (tower) {
 };
 
 const message = (game) => {
-  const visibility = game.isGameOver ? 'initial' : 'hidden';
+  const visibility = game.isOver ? 'initial' : 'hidden';
   const elementClass = attribute('class', 'message');
   const style = attribute('style', 'visibility:' + visibility);
   return element('div', 'You WON!', elementClass + ' ' + style);
