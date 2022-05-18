@@ -26,8 +26,6 @@ const isValidMove = function ({ destinationTower, sourceTower }, maxSize) {
   return topOfStack(destinationTower) > topOfStack(sourceTower);
 };
 
-const copy = (obj) => JSON.parse(JSON.stringify(obj));
-
 const isInRange = (value, max) => value >= 0 && value <= max;
 
 const areValidInputs = (from, to, max) => {
@@ -35,18 +33,17 @@ const areValidInputs = (from, to, max) => {
 };
 
 const playMove = function (game, { from, to }) {
-  const gameStatus = copy(game);
-  const sourceTower = gameStatus.towers[from];
-  const destinationTower = gameStatus.towers[to];
+  const sourceTower = game.towers[from];
+  const destinationTower = game.towers[to];
 
-  gameStatus.totalMoves++;
+  game.totalMoves++;
   const towers = { sourceTower, destinationTower };
   const { totalTowers, maxSize } = game;
   if (areValidInputs(from, to, totalTowers) && isValidMove(towers, maxSize)) {
     destinationTower.push(sourceTower.pop());
   }
 
-  return gameStatus;
+  return game;
 };
 
 const isGameOver = (game) => deepEqual(game.towers[3], [9, 8, 7, 6]);
@@ -88,3 +85,4 @@ exports.isUnderflow = isUnderflow;
 exports.isValidMove = isValidMove;
 exports.isGameOver = isGameOver;
 exports.topOfStack = topOfStack;
+exports.playMove = playMove;
